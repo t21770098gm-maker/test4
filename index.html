@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Photography</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html" class="active">Home</a>
+            <a href="albums.html">Albums</a>
+            <a href="favorites.html">Favorites</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <button class="nav-arrow" id="prevBtn" aria-label="Previous photo">
+            <i class="ti ti-arrow-left"></i>
+        </button>
+
+        <div class="gallery-center">
+            <div class="photo-container" id="openLightboxBtn">
+                <img id="mainPhoto" src="" alt="Featured Photography">
+                <div class="expand-hint">
+                    <i class="ti ti-maximize"></i> View larger
+                </div>
+            </div>
+            <div class="dots" id="dots"></div>
+            <div class="caption" id="photoCaption"></div>
+        </div>
+
+        <button class="nav-arrow" id="nextBtn" aria-label="Next photo">
+            <i class="ti ti-arrow-right"></i>
+        </button>
+    </main>
+
+    <footer>
+        <nav>
+            <a href="index.html" class="active">Home</a>
+            <a href="albums.html">Albums</a>
+            <a href="favorites.html">Favorites</a>
+            <a href="about.html">About</a>
+        </nav>
+    </footer>
+
+    <div id="lightbox" class="lightbox">
+        <button class="close-btn" id="closeLightboxBtn">
+            <i class="ti ti-x"></i> Close
+        </button>
+        <button class="nav-arrow" id="modalPrev" aria-label="Previous photo">
+            <i class="ti ti-arrow-left"></i>
+        </button>
+        <img id="lightboxImg" class="lightbox-content" src="" alt="Full size photo">
+        <button class="nav-arrow" id="modalNext" aria-label="Next photo">
+            <i class="ti ti-arrow-right"></i>
+        </button>
+    </div>
+
+    <script>
+        const photos = [
+            { url: "https://picsum.photos/id/1015/1200/800", album: "Nature Walks" },
+            { url: "https://picsum.photos/id/1018/1200/800", album: "Family Vacation 2025" },
+            { url: "https://picsum.photos/id/1019/1200/800", album: "Pets" },
+            { url: "https://picsum.photos/id/1022/1200/800", album: "Astrophotography" }
+        ];
+
+        let currentIndex = 0;
+
+        const mainImgElement = document.getElementById('mainPhoto');
+        const captionElement = document.getElementById('photoCaption');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const dotsContainer = document.getElementById('dots');
+
+        // Build dot indicators
+        photos.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'dot';
+            dot.setAttribute('aria-label', `Go to photo ${i + 1}`);
+            dot.addEventListener('click', () => { currentIndex = i; updateDisplays(); });
+            dotsContainer.appendChild(dot);
+        });
+
+        function loadRandomPhoto() {
+            currentIndex = Math.floor(Math.random() * photos.length);
+            updateDisplays();
+        }
+
+        function updateDisplays() {
+            const currentPhoto = photos[currentIndex];
+            mainImgElement.src = currentPhoto.url;
+            captionElement.innerHTML = `Album: <strong>${currentPhoto.album}</strong>`;
+            lightboxImg.src = currentPhoto.url;
+
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function goBack() {
+            currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+            updateDisplays();
+        }
+
+        function goForward() {
+            currentIndex = (currentIndex + 1) % photos.length;
+            updateDisplays();
+        }
+
+        document.getElementById('prevBtn').addEventListener('click', goBack);
+        document.getElementById('nextBtn').addEventListener('click', goForward);
+        document.getElementById('modalPrev').addEventListener('click', goBack);
+        document.getElementById('modalNext').addEventListener('click', goForward);
+
+        document.getElementById('openLightboxBtn').addEventListener('click', () => {
+            lightbox.classList.add('active');
+        });
+
+        document.getElementById('closeLightboxBtn').addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) lightbox.classList.remove('active');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') lightbox.classList.remove('active');
+            if (e.key === 'ArrowLeft') goBack();
+            if (e.key === 'ArrowRight') goForward();
+        });
+
+        loadRandomPhoto();
+    </script>
+</body>
+</html>
